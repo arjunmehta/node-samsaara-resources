@@ -1,19 +1,23 @@
 {
-  "name": "samsaara-resource",
+  "name": "samsaara-resources",
   "version": "0.0.0",
-  "description": "node-samsaara-resource ======================",
+  "description": "node-samsaara-resources ======================",
   "main": "main.js",
+  "dependencies": {
+    "debug" : "~0.8.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/arjunmehta/node-samsaara-resource.git"
+    "url": "git://github.com/arjunmehta/node-samsaara-resources.git"
   },
+
   "author": "Arjun Mehta",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/arjunmehta/node-samsaara-resource/issues"
+    "url": "https://github.com/arjunmehta/node-samsaara-resources/issues"
   },
-  "homepage": "https://github.com/arjunmehta/node-samsaara-resource"
+  "homepage": "https://github.com/arjunmehta/node-samsaara-resources"
 }
