@@ -29,13 +29,14 @@ function initialize(samsaaraCore, resourcesObj){
 
 
 function Resource(resourceID, resource, autoExpose){  
+
   this.id = resourceID;
   this.data = resource;
 
   samsaara.createNamespace("RSRC_"+resourceID);
 
   if(autoExpose === true){
-    autoExposeResourceMethods(resourceID, resource);
+    exposeResourceMethods(resourceID, resource);
   }
 }
 
@@ -43,7 +44,8 @@ Resource.prototype.expose = function(exposed){
   samsaara.nameSpace("RSRC_"+this.id).expose(exposed);
 };
 
-function autoExposeResourceMethods(resourceID, resource){
+
+function exposeResourceMethods(resourceID, resource){
   var exposed = {};
   for(var propName in resource){
     if(typeof resource[propName] === "function"){
@@ -53,7 +55,7 @@ function autoExposeResourceMethods(resourceID, resource){
 
   console.log("EXPOSED Namespace Methods", "RSRC_"+resourceID, samsaara.nameSpace("RSRC_"+resourceID));
 
-  
+
   samsaara.nameSpace("RSRC_"+resourceID).expose(exposed);
 
   console.log("EXPOSED Namespace Methods", "RSRC_"+resourceID, samsaara.nameSpace("RSRC_"+resourceID));
