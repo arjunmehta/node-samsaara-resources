@@ -79,51 +79,75 @@ function initialize(samsaaraCore){
 }
 
 
-// main
 
-function createResource(resourceID, resource, autoExpose, callBack){
-  if(typeof autoExpose === "function"){
-    callBack = autoExpose;
-    autoExpose = undefined;
-  }
+
+function resourceExists(resourceID, callBack){
 
   if(resources[resourceID] === undefined){
-    resources[resourceID] = new Resource(resourceID, resource, autoExpose);
-    if(typeof callBack === "function") callBack(null, resources[resourceID]);
+    if(typeof callBack === "function") callBack(false, null);
   }
   else{
-    if(typeof callBack === "function") callBack(new Error("Resource "+resourceID+" exists"), null);
+    if(typeof callBack === "function") callBack(true, "local");
   }
 }
 
-function createResourceIPC(resourceID, resource, autoExpose, callBack){
 
-
-  debug("Creating Resource");
-
-  if(typeof autoExpose === "function"){
-    callBack = autoExpose;
-    autoExpose = undefined;
-  }
-
+function resourceExistsIPC(resourceID, callBack){
   if(resources[resourceID] === undefined){
     ipc.store.hexists("samsaara:resourceOwners", resourceID, function (err, exists){
       if(~~exists === 1){
-        if(typeof callBack === "function") callBack(new Error("Resource "+resourceID+" exists"), null);
+        if(typeof callBack === "function") callBack(true, "remote");
       }
       else{
-        ipc.store.hset("samsaara:resourceOwners", resourceID, core.uuid, function(err, reply){
-          resources[resourceID] = new Resource(resourceID, resource, autoExpose);
-          samsaara.emit("newResource", resources[resourceID]);
-          if(typeof callBack === "function") callBack(null, resources[resourceID]);
-        });
-        
+        if(typeof callBack === "function") callBack(false, null);
       }
     });
   }
   else{
-    if(typeof callBack === "function") callBack(new Error("Resource "+resourceID+" exists"), null);
+    if(typeof callBack === "function") callBack(true, "local");
   }
+}
+
+
+// main
+
+function createResource(resourceID, resource, options, callBack){
+  if(typeof options === "function"){
+    callBack = options;
+    options = undefined;
+  }
+
+  resourceExists(resourceID, function(exists){
+    if(exists === false){
+      resources[resourceID] = new Resource(resourceID, resource, options);
+      samsaara.emit("newResource", resources[resourceID]);
+      if(typeof callBack === "function") callBack(null, resources[resourceID]);
+    }
+    else{
+      if(typeof callBack === "function") callBack(new Error("Resource "+resourceID+" exists"), null);
+    }
+  });
+}
+
+function createResourceIPC(resourceID, resource, options, callBack){
+
+  debug("Creating Resource");
+
+  if(typeof options === "function"){
+    callBack = options;
+    options = undefined;
+  }
+
+  resourceExistsIPC(resourceID, function(exists){
+    if(exists === false){
+      resources[resourceID] = new Resource(resourceID, resource, options);
+      samsaara.emit("newResource", resources[resourceID]);
+      if(typeof callBack === "function") callBack(null, resources[resourceID]);
+    }
+    else{
+      if(typeof callBack === "function") callBack(new Error("Resource "+resourceID+" exists"), null);
+    }
+  });
 }
 
 
@@ -183,7 +207,7 @@ function route(connection, headerbits, message){
 
   var resourceID = headerbits[1];
 
-  if(resourceID !== undefined && resources[resourceID] !== undefined){
+  if(resources[resourceID] !== undefined){
     var messageObj = parseJSON(message);
     if(messageObj !== undefined){
       communication.executeFunction(connection, resources[resourceID].data, messageObj);

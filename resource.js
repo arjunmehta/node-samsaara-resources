@@ -28,15 +28,17 @@ function initialize(samsaaraCore, resourcesObj){
 }
 
 
-function Resource(resourceID, resource, autoExpose){  
+function Resource(resourceID, resource, options){  
 
   this.id = resourceID;
   this.data = resource;
 
   samsaara.createNamespace("RSRC_"+resourceID);
 
-  if(autoExpose === true){
-    exposeResourceMethods(resourceID, resource);
+  if(options !== undefined){
+    if(options.autoExpose === true){
+      exposeResourceMethods(resourceID, resource);
+    }    
   }
 }
 
